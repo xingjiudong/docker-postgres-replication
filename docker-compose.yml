@@ -9,8 +9,8 @@ networks:
   postgres-network:
 services:
   pg-master:
-    image: 'xingjiudong/postgres-replication:${POSTGRES_VERSION}'
-    restart: 'always'
+    image: xingjiudong/postgres-replication:${POSTGRES_VERSION}
+    restart: always
     cpu_quota: 90000
     mem_limit: 3000M
     memswap_limit: -1
@@ -21,17 +21,18 @@ services:
     dns:
      - ${DNS_SERVER}
     ports:
-     - '5432'
+     - "5432"
     networks:
      - postgres-network
     environment:
+     - affinity:container!=*pg*
      - constraint:volume.driver==${VOLUME_DRIVER}
-     - POSTGRES_USER='${POSTGRES_USER}'
-     - POSTGRES_PASSWORD='${POSTGRES_PASSWORD}'
-     - PGDATA='/var/lib/postgresql/data/pgdata'
+     - POSTGRES_USER=${POSTGRES_USER}
+     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+     - PGDATA=/var/lib/postgresql/data/pgdata
   pg-slave:
-    image: 'xingjiudong/postgres-replication:${POSTGRES_VERSION}'
-    restart: 'always'
+    image: xingjiudong/postgres-replication:${POSTGRES_VERSION}
+    restart: always
     cpu_quota: 90000
     mem_limit: 3000M
     memswap_limit: -1
@@ -42,15 +43,16 @@ services:
     dns:
      - ${DNS_SERVER}
     ports:
-     - '5432'
+     - "5432"
     networks:
      - postgres-network
     depends_on:
-     - 'pg-master'
+     - "pg-master"
     environment:
+     - affinity:container!=*pg*
      - constraint:volume.driver==${VOLUME_DRIVER}
-     - POSTGRES_USER='${POSTGRES_USER}'
-     - POSTGRES_PASSWORD='${POSTGRES_PASSWORD}'
-     - PGDATA='/var/lib/postgresql/data/pgdata'
-     - REPLICATE_FROM='pg-master'
+     - POSTGRES_USER=${POSTGRES_USER}
+     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+     - PGDATA=/var/lib/postgresql/data/pgdata
+     - REPLICATE_FROM=pg-master
 
